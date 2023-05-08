@@ -1,76 +1,101 @@
-<template>
-  <header>
-    <AppNavbar />
-  </header>
-
-  <main>
-    <AppRegistration v-if="isVisible" @visible="handleSubmit"/>
-    <AppGame v-if="!isVisible" :submitted-name="submittedName" />
-  </main>
-
-  <footer>
-    <AppFooter />
-  </footer>
-</template>
-
 <script>
-import AppNavbar from "@/components/AppNavbar.vue";
-import AppRegistration from "@/components/AppRegistration.vue";
-import AppFooter from "@/components/AppFooter.vue";
-import AppGame from "@/components/AppGame.vue";
+import PageLeader from "@/pages/PageLeader";
+import NotFound from '@/pages/NotFound'
+import PageHome from "@/pages/PageHome";
+
+import MenuItem from "@/components/UI/MenuItem.vue";
+
+const routes = {
+  '/': PageHome,
+  '/leader': PageLeader
+}
 
 export default {
-  name: "PageComponent",
-  components: {
-    AppGame,
-    AppFooter,
-    AppRegistration,
-    AppNavbar
-
-  },
+  components: { MenuItem },
   data() {
     return {
-      isVisible: true,
-      submittedName: "",
-      loadedData: "",
-    };
+      currentPath: window.location.hash,
+      menuItems: [
+        { path: "#/", label: "Игра" },
+        { path: "#/leader", label: "Лидеры" },
+      ],
+    }
   },
-  methods: {
-    handleSubmit(event) {
-      console.log(event);
-      this.isVisible = event.data;
-      this.submittedName = event.inputValue;
-      localStorage.name = this.submittedName;
-    },
+  computed: {
+    currentView() {
+      return routes[this.currentPath.slice(1) || '/'] || NotFound
+    }
   },
-};
+  mounted() {
+    window.addEventListener('hashchange', () => {
+      this.currentPath = window.location.hash
+    })
+  }
+}
 </script>
 
+<template>
+  <nav class="app-navbar">
+    <div class="app-navbar__logo">
+      <a href="/"><img class="app_logo" src="./assets/logo2.png"></a>
+    </div>
+    <ul class="app-navbar__menu">
+      <li v-for="item in menuItems" :key="item.label">
+        <MenuItem :path="item.path" :label="item.label"></MenuItem>
+      </li>
+    </ul>
+  </nav>
+  <component :is="currentView" />
+</template>
+
 <style>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+.app_logo{
+  width: 60px;
+
 }
-body {
-  background-color: #1d1e21;
-  font-family: 'Roboto', Arial, sans-serif;
+.app-navbar {
+  background-color: #333;
+  color: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 20px;
+  border-radius: 10px;
 }
 
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
+.app-navbar__logo {
+  font-size: 24px;
 }
-main {
-  height: calc(100vh - 68px - 68px);
-  padding: 20px 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+
+.app-navbar__logo a {
   color: #fff;
+  text-decoration: none;
 }
+
+.app-navbar__menu {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.app-navbar__menu li + li {
+  margin-left: 10px;
+}
+
+.app-navbar__menu li a {
+  color: #fff;
+  text-decoration: none;
+}
+
+.app-navbar__menu li a:hover {
+  text-decoration: underline;
+  color: aqua;
+}
+@media(max-width: 600px) {
+  .app-navbar {
+    padding: 10px;
+  }
+}
+
 </style>

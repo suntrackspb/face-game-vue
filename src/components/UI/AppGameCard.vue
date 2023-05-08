@@ -1,11 +1,11 @@
 <template>
   <div class="app-card">
-    <img :src="'https://sntrk.ru/faces/' + quest + '.png'" />
+    <img :src="quest" :alt="quest_id"/>
     <div class="app-answers">
       <AppAnswerBtn
           v-for="answer in ans"
           :key="answer.id"
-          @click="emitCheckAnswer(quest, answer)"
+          @click="emitCheckAnswer(quest_id, answer)"
       >
         {{ answer }}
       </AppAnswerBtn>
@@ -22,25 +22,65 @@ export default {
     AppAnswerBtn
   },
   props: {
-    quest: Number,
+    quest: String,
+    quest_id: String,
     ans: Array,
   },
   methods: {
-    emitCheckAnswer(id, name) {
-      console.log(id, name)
-      this.$emit('check-answer', id, name);
-      this.$emit('next');
+    emitCheckAnswer(quest_id, name) {
+      // console.log(quest_id, name)
+      this.$emit('check-answer', quest_id, name);
     }
   },
 };
 </script>
 
 <style scoped>
+.app-card {
+  margin: 30px;
+  /*background: #333;*/
+  border-radius: 20px;
+}
 .app-answers {
+  width: 100%;
+  box-sizing: border-box;
   display: flex;
+  flex-direction: column;
+  align-items: center;
+
 }
 img {
-  width: 400px;
+  width: 100%;
+  border-radius: 10px 10px 0 0;
+  display: block;
+}
+@media(min-width: 600px) {
+  .app-card {
+    width: 500px;
+  }
+  .app-answers {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+}
+
+@media(max-width: 600px) {
+  .app-answers {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+  .app-ans-button:hover {
+    background: #7a7a7a;
+    color: white;
+  }
+
+  .app-ans-button:active {
+    background: #3b77d2;
+    color: white;
+    transition: all 0.01s ease;
+  }
 }
 </style>
 

@@ -22,8 +22,6 @@ export default {
     return {
       menuItems: [
         { path: "/", label: "Home" },
-        { path: "/about", label: "About" },
-        { path: "/contact", label: "Contact" },
       ],
     };
   },
@@ -38,7 +36,7 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px 150px;
+  padding: 20px 20px;
   border-radius: 10px;
 }
 
@@ -71,4 +69,10 @@ export default {
   text-decoration: underline;
   color: aqua;
 }
+@media(max-width: 600px) {
+  .app-navbar {
+    padding: 10px;
+  }
+}
+
 </style>

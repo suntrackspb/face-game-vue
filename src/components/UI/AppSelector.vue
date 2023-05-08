@@ -3,6 +3,7 @@
     <option
         v-for="cat in categories"
         :key="cat.id"
+        :value="cat.id"
     > {{cat.name}}</option>
   </select>
 </template>
@@ -14,12 +15,15 @@ export default {
   data() {
     return {
       categories: [
-        {id: "1", name: "Актёры"},
-        {id: "2", name: "Политики"},
-        {id: "3", name: "Музыканты"},
-        {id: "4", name: "Долбаёбы"},
+        {id: "null", name: "выберите категорию"},
+        {id: "actors", name: "Актёры Голливуда"},
+        {id: "politics", name: "МировыеПолитики"},
+        {id: "musics", name: "Иностранные Музыканты"},
+        {id: "rus_films", name: "Российские фильмы"},
+        {id: "en_person", name: "Иностранные персоны"},
+        {id: "en_youtube", name: "Заграничный YouTube"},
       ],
-      selectValue: 'Актёры'
+      selectValue: 'null'
     }
   },
 }
@@ -41,7 +45,7 @@ select {
   appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
-  background-image: url('../../../public/images/arrow.png');
+  /*background-image: url('../../../public/images/arrow.png');*/
   background-size: 20px;
   background-repeat: no-repeat;
   background-position-y: center;

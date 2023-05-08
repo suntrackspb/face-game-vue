@@ -1,43 +1,45 @@
 <template>
   <div>
-<!--    <h1>{{ submittedName }}</h1>-->
-<!--    <h1>Game is ready!</h1>-->
     <AppGameCard
         :quest="question"
         :ans="answers"
-        @next="nextQuestion"
+        :quest_id="quest_id"
         @check-answer="checkAnswer"
         v-if="isVisible"
+        :class="r_class"
     />
-    <AppResults v-if="!isVisible" :res="result"/>
+    <AppResults v-if="!isVisible" :results="result"/>
   </div>
 </template>
 
 <script>
 import AppGameCard from "@/components/UI/AppGameCard.vue";
 import axios from "axios";
-import AppResults from "@/components/UI/AppResults.vue";
+import AppResults from "@/components/AppResults.vue";
 
 export default {
   name: "AppGame",
-  components: {AppResults, AppGameCard },
+  components: { AppResults, AppGameCard },
   props: {
     submittedName: String,
+    game_id: String,
   },
   data() {
     return {
-      question: 0,
+      quest_id: '',
+      question: '',
       answers: [],
       isVisible: true,
-      result: []
+      result: {},
+      r_class: 'default'
     };
   },
   methods: {
     nextQuestion() {
       const data = {
-        name: localStorage.name,
+        game_id: localStorage.game_id,
       }
-
+      // console.log(data)
       const config = {
         headers: {
           'Content-Type': 'application/json'
@@ -46,19 +48,45 @@ export default {
 
       axios.post('http://192.168.0.100:5000/api/v1/question', data, config)
           .then(response => {
-            console.log(response.data)
-            this.question = response.data.id;
-            this.answers = response.data.names;
+            // console.log(response.data)
+            this.quest_id = response.data.quest_id
+            this.question = response.data.question;
+            this.answers = response.data.answers;
+            if(response.data.status === 'end')
+            {
+              this.get_result()
+            }
           })
           .catch(error => {
             console.error(error)
           })
     },
-
-    checkAnswer(id, answer) {
+    get_result(){
       const data = {
-        name: localStorage.name,
-        id: id,
+        game_id: localStorage.game_id,
+      }
+
+      const config = {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }
+
+      axios.post('http://192.168.0.100:5000/api/v1/results', data, config)
+          .then(response => {
+            // console.log("RESULT RUN")
+            // console.log(response.data)
+            this.isVisible = false
+            this.result = response.data
+          })
+          .catch(error => {
+            console.error(error)
+          })
+    },
+    checkAnswer(quest_id, answer) {
+      const data = {
+        game_id: localStorage.game_id,
+        quest_id: quest_id,
         answer: answer,
       }
 
@@ -70,11 +98,17 @@ export default {
 
       axios.post('http://192.168.0.100:5000/api/v1/answer', data, config)
           .then(response => {
-            console.log(response.data)
-            if(response.data.status === 'end')
+            if(response.data.status === 'ok')
             {
-              this.isVisible = false
-              this.result = response.data.result
+              if(response.data.answer){
+                this.r_class = 'true'
+              } else {
+                this.r_class = 'false'
+              }
+              setTimeout(() => {
+                this.r_class = 'default'
+                this.nextQuestion();
+              }, 500);
             }
           })
           .catch(error => {
@@ -82,12 +116,22 @@ export default {
           })
     }
   },
-  created() {
-    this.nextQuestion()
+  mounted() {
+    setTimeout(() => {
+      this.nextQuestion();
+    }, 100);
   },
 };
 </script>
 
 <style scoped>
-
+.default {
+  border: 5px solid #1d1e21;
+}
+.true {
+  border: 5px solid #89d23b;
+}
+.false {
+  border: 5px solid #d33b01;
+}
 </style>
